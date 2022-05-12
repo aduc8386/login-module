@@ -1,22 +1,29 @@
 package omt.aduc8386.loginmodule.model;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 
 public class User extends RealmObject {
 
+    @PrimaryKey
     @SerializedName("id")
     private Integer id;
     @SerializedName("email")
     private String email;
     @SerializedName("avatar")
     private String avatar;
-    @SerializedName("first_name")
+    @SerializedName(value = "firstName", alternate = {"first_name", "name"})
     private String firstName;
     @SerializedName("last_name")
     private String lastName;
+    @SerializedName("job")
+    private String job;
+    @SerializedName("createdAt")
+    private long createdAt;
 
     public String getLastName() {
         return lastName != null ? lastName : "";

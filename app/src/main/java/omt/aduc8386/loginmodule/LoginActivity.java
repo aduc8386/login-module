@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.realm.Realm;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.model.Account;
 import omt.aduc8386.loginmodule.model.MyResponse;
@@ -46,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         SharedPreferencesHelper.init(this);
+        Realm.init(this);
 
         bindView();
 
@@ -115,6 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.apply();
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     Toast.makeText(LoginActivity.this, String.format("Token: %s", authToken), Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                     intentActivityResultLauncher.launch(intent);
                 } else if(account.getPassword().trim().isEmpty()) {

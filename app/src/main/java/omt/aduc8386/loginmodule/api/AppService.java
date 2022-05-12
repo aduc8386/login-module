@@ -14,7 +14,7 @@ public class AppService {
     static OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
     private static final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://reqres.in/")
+            .baseUrl("https://reqres.in/api/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build();

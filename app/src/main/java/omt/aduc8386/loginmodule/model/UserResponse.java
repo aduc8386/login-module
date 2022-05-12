@@ -19,27 +19,6 @@ public class UserResponse extends RealmObject {
     @SerializedName("data")
     private RealmList<User> users;
 
-
-    public Integer getPage() {
-        return page;
-    }
-
-    public Integer getPerPage() {
-        return perPage;
-    }
-
-    public Integer getTotal() {
-        return total;
-    }
-
-    public Integer getTotalPages() {
-        return totalPages;
-    }
-
-    public Support getSupport() {
-        return support;
-    }
-
     public RealmList<User> getUsers() {
         return users;
     }

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.model.User;
@@ -24,6 +25,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnLogout;
+    private Button btnAddUser;
     private RecyclerView rcvUserList;
     private List<User> users;
 
@@ -35,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
         bindView();
 
         callApi();
+
+        btnAddUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,16 +65,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void callApi() {
-        AppService.init().getUsers().enqueue(new Callback<UserResponse>() {
+        AppService.init().getUsers(2).enqueue(new Callback<UserResponse>() {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                if(response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(MainActivity.this, "Api called successful", Toast.LENGTH_SHORT).show();
                     users = response.body().getUsers();
 
+                    RealmHelper realmHelper = new RealmHelper();
 
+                    for (User user : users) {
+                        realmHelper.insertToRealm(user);
+                    }
 
-                    showUserList(users);
+                    List<User> userRealmResults = realmHelper.getInstance().where(User.class).findAll();
+
+                    showUserList(userRealmResults);
 
                 }
             }
@@ -85,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private void bindView() {
         rcvUserList = findViewById(R.id.rcv_user_list);
         btnLogout = findViewById(R.id.btn_logout);
+        btnAddUser = findViewById(R.id.btn_add_user);
         rcvUserList.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -92,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        if(isLoggedIn()){
+        if (isLoggedIn()) {
             finishAffinity();
             System.exit(0);
         }
