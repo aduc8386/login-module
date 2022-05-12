@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="18dp"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/white">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_login_title"
@@ -28,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:hint="Email"
+        android:text="eve.holt@reqres.in"
         android:padding="12dp"
         android:textColor="@color/black"
         android:textColorHint="@color/gray"
@@ -42,6 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:hint="Password"
+        android:text="cityslicka"
         android:inputType="textPassword"
         android:padding="12dp"
         android:textColor="@color/black"

@@ -4,10 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -42,7 +44,13 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, false);
                 editor.putString(SharedPreferencesHelper.USER_EMAIL, "");
                 editor.putString(SharedPreferencesHelper.USER_PASSWORD, "");
+                editor.putString(SharedPreferencesHelper.USER_TOKEN, "");
                 editor.apply();
+
+                Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
@@ -52,8 +60,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if(response.isSuccessful() && response.body() != null) {
-
+                    Toast.makeText(MainActivity.this, "Api called successful", Toast.LENGTH_SHORT).show();
                     users = response.body().getUsers();
+
+
 
                     showUserList(users);
 
@@ -62,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
-
+                Toast.makeText(MainActivity.this, "Api call failed", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -78,4 +88,17 @@ public class MainActivity extends AppCompatActivity {
         rcvUserList.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if(isLoggedIn()){
+            finishAffinity();
+            System.exit(0);
+        }
+    }
+
+    private boolean isLoggedIn() {
+        return !SharedPreferencesHelper.getUserToken(SharedPreferencesHelper.USER_TOKEN).isEmpty();
+    }
 }

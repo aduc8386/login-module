@@ -10,6 +10,10 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,6 +32,15 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private Button btnSignUp;
 
+    public ActivityResultLauncher<Intent> intentActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if(result.getResultCode() == RESULT_OK) {
+                    edtEmail.setText(SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_EMAIL));
+                    edtPassword.setText(SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_PASSWORD));
+                    cbRememberMe.setChecked(SharedPreferencesHelper.getRememberMeCheck(SharedPreferencesHelper.REMEMBER_ME));
+                }
+            });
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,13 +49,7 @@ public class LoginActivity extends AppCompatActivity {
 
         bindView();
 
-        boolean rememberMe = SharedPreferencesHelper.getRememberMeCheck(SharedPreferencesHelper.REMEMBER_ME);
-        String userEmail = SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_EMAIL);
-        String userPassword = SharedPreferencesHelper.getUserPassword(SharedPreferencesHelper.USER_PASSWORD);
-
-        Account userAccount = new Account(userEmail, userPassword);
-
-        if(rememberMe) login(userAccount);
+        if(checkRememberAccount()) return;
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,17 +69,35 @@ public class LoginActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
 
-                if (buttonView.isChecked()) {
+                if (buttonView.isChecked() && !edtEmail.getText().toString().isEmpty() && !edtPassword.getText().toString().isEmpty()) {
                     editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, true);
                     Toast.makeText(LoginActivity.this, "Remember password", Toast.LENGTH_SHORT).show();
                 } else {
                     editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, false);
+                    editor.putString(SharedPreferencesHelper.USER_EMAIL, "");
+                    editor.putString(SharedPreferencesHelper.USER_PASSWORD, "");
                     Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
                 }
-
                 editor.apply();
             }
         });
+    }
+
+    private boolean checkRememberAccount() {
+        boolean rememberMe = SharedPreferencesHelper.getRememberMeCheck(SharedPreferencesHelper.REMEMBER_ME);
+        String userEmail = SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_EMAIL);
+        String userPassword = SharedPreferencesHelper.getUserPassword(SharedPreferencesHelper.USER_PASSWORD);
+
+        if(rememberMe) {
+            Account userAccount = new Account(userEmail, userPassword);
+            edtEmail.setText(userEmail);
+            edtPassword.setText(userPassword);
+            cbRememberMe.setChecked(true);
+            login(userAccount);
+            return true;
+        }
+
+        return false;
     }
 
     private void login(Account account) {
@@ -91,7 +116,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     Toast.makeText(LoginActivity.this, String.format("Token: %s", authToken), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(intent);
+                    intentActivityResultLauncher.launch(intent);
                 } else if(account.getPassword().trim().isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Missing password", Toast.LENGTH_SHORT).show();
                 } else
