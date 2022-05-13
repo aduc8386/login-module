@@ -20,4 +20,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+    <style name="AlertDialog.AppCompat.RoundedBackground" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/bg_add_user_dialog</item>
+    </style>
 </resources>

@@ -8,10 +8,12 @@ import io.realm.RealmObject;
 
 public class UserResponse extends RealmObject {
 
+    @SerializedName("page")
     private Integer page;
+    @SerializedName("support")
     private Support support;
+    @SerializedName("total")
     private Integer total;
-
     @SerializedName("per_page")
     private Integer perPage;
     @SerializedName("total_pages")

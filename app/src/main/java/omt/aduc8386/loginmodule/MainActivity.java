@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import io.realm.RealmList;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.model.User;
 import omt.aduc8386.loginmodule.model.UserResponse;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
     private Button btnLogout;
     private Button btnAddUser;
     private RecyclerView rcvUserList;
-    private UserAdapter userAdapter;
+    private RealmHelper realmHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
                     Toast.makeText(MainActivity.this, "Api called successful", Toast.LENGTH_SHORT).show();
                     List<User> users = response.body().getUsers();
 
-                    RealmHelper realmHelper = new RealmHelper();
+                    realmHelper = new RealmHelper();
 
                     for (User user : users) {
                         realmHelper.insertToRealm(user);
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
     }
 
     private void showUserList(List<User> users) {
-        userAdapter = new UserAdapter(users);
+        UserAdapter userAdapter = new UserAdapter(users);
         rcvUserList.setAdapter(userAdapter);
     }
 
@@ -128,6 +129,8 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
 
                 if(response.isSuccessful() && newUser != null) {
                     Toast.makeText(MainActivity.this, "User added", Toast.LENGTH_SHORT).show();
+
+                    realmHelper.insertToRealm(user);
 
                     callApi();
                 }

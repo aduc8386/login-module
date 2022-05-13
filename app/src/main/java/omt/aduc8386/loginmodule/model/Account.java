@@ -9,8 +9,6 @@ public class Account {
     @SerializedName("password")
     private String password;
 
-    private String name;
-
     public Account(String email, String password) {
         this.email = email;
         this.password = password;
