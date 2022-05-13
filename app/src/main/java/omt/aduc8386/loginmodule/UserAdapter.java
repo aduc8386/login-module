@@ -18,9 +18,11 @@ import omt.aduc8386.loginmodule.model.User;
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
 
     private List<User> users;
+    private OnUserClickListener onUserClickListener;
 
-    public UserAdapter(List<User> users) {
+    public UserAdapter(List<User> users, OnUserClickListener onUserClickListener) {
         this.users = users;
+        this.onUserClickListener = onUserClickListener;
     }
 
     @NonNull
@@ -30,7 +32,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
 
         View userView = inflater.inflate(R.layout.item_view_user, parent, false);
 
-        return new UserAdapter.MyViewHolder(userView);
+        return new UserAdapter.MyViewHolder(userView, onUserClickListener);
     }
 
     @Override
@@ -52,19 +54,26 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
         return users != null ? users.size() : 0;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivAvatar;
         private TextView tvName;
         private TextView tvEmail;
 
-
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(@NonNull View itemView, OnUserClickListener onUserClickListener) {
             super(itemView);
 
             ivAvatar = itemView.findViewById(R.id.iv_avatar);
             tvName = itemView.findViewById(R.id.tv_name);
             tvEmail = itemView.findViewById(R.id.tv_email);
+
+            itemView.setOnClickListener(v -> {
+                onUserClickListener.onUserClick(getAdapterPosition());
+            });
         }
+    }
+
+    public interface OnUserClickListener {
+        void onUserClick(int position);
     }
 }

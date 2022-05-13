@@ -24,6 +24,8 @@ public class User extends RealmObject {
     private String job;
     @SerializedName("createdAt")
     private String createdAt;
+    @SerializedName("updateAt")
+    private String updateAt;
 
     public User() {
     }
