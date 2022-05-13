@@ -23,14 +23,22 @@ public class User extends RealmObject {
     @SerializedName("job")
     private String job;
     @SerializedName("createdAt")
-    private long createdAt;
+    private String createdAt;
+
+    public User() {
+    }
+
+    public User(String firstName, String job) {
+        this.firstName = firstName;
+        this.job = job;
+    }
 
     public String getLastName() {
         return lastName != null ? lastName : "";
     }
 
     public String getEmail() {
-        return email != null ? email : "";
+        return email != null ? email : "abc@example.com";
     }
 
     public String getAvatar() {

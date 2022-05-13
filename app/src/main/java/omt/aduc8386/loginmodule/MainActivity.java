@@ -13,8 +13,6 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmList;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.model.User;
 import omt.aduc8386.loginmodule.model.UserResponse;
@@ -22,12 +20,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AddUserFragment.AddUserListener {
 
     private Button btnLogout;
     private Button btnAddUser;
     private RecyclerView rcvUserList;
-    private List<User> users;
+    private UserAdapter userAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         btnAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                openAddUserDialog();
             }
         });
 
@@ -64,13 +62,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void openAddUserDialog() {
+        AddUserFragment addUserFragment = new AddUserFragment();
+        addUserFragment.show(getSupportFragmentManager(), "Add user");
+    }
+
     private void callApi() {
-        AppService.init().getUsers(2).enqueue(new Callback<UserResponse>() {
+        AppService.init().getUsers(1).enqueue(new Callback<UserResponse>() {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(MainActivity.this, "Api called successful", Toast.LENGTH_SHORT).show();
-                    users = response.body().getUsers();
+                    List<User> users = response.body().getUsers();
 
                     RealmHelper realmHelper = new RealmHelper();
 
@@ -78,9 +81,7 @@ public class MainActivity extends AppCompatActivity {
                         realmHelper.insertToRealm(user);
                     }
 
-                    List<User> userRealmResults = realmHelper.getInstance().where(User.class).findAll();
-
-                    showUserList(userRealmResults);
+                    showUserList(users);
 
                 }
             }
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showUserList(List<User> users) {
-        UserAdapter userAdapter = new UserAdapter(users);
+        userAdapter = new UserAdapter(users);
         rcvUserList.setAdapter(userAdapter);
     }
 
@@ -116,5 +117,26 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isLoggedIn() {
         return !SharedPreferencesHelper.getUserToken(SharedPreferencesHelper.USER_TOKEN).isEmpty();
+    }
+
+    @Override
+    public void addUser(User user) {
+        AppService.init().addUser(user).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User newUser = response.body();
+
+                if(response.isSuccessful() && newUser != null) {
+                    Toast.makeText(MainActivity.this, "User added", Toast.LENGTH_SHORT).show();
+
+                    callApi();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "User add failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

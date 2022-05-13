@@ -17,8 +17,7 @@ public interface Service {
     Call<MyResponse> login(@Body Account account);
 
     @POST("users")
-    Call<User> addUser(@Query("name") String name,
-                       @Query("job") String job);
+    Call<User> addUser(@Body User user);
 
     @GET("users")
     Call<UserResponse> getUsers(@Query("page") int pageNumber);
