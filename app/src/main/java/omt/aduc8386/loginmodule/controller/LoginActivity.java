@@ -57,8 +57,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String email = edtEmail.getText().toString();
-                String password = edtPassword.getText().toString();
+                String email = edtEmail.getText().toString().trim();
+                String password = edtPassword.getText().toString().trim();
+
 
                 Account account = new Account(email, password);
 
@@ -71,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
 
-                if (buttonView.isChecked() && !edtEmail.getText().toString().isEmpty() && !edtPassword.getText().toString().isEmpty()) {
+                if (buttonView.isChecked()) {
                     editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, true);
                     Toast.makeText(LoginActivity.this, "Remember password", Toast.LENGTH_SHORT).show();
                 } else {
@@ -120,7 +121,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                     intentActivityResultLauncher.launch(intent);
-                } else if(account.getPassword().trim().isEmpty()) {
+
+                } else if(account.getEmail().isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Email is required", Toast.LENGTH_SHORT).show();
+                } else if(account.getPassword().isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Missing password", Toast.LENGTH_SHORT).show();
                 } else
                     Toast.makeText(LoginActivity.this, "Email or password incorrect", Toast.LENGTH_SHORT).show();
