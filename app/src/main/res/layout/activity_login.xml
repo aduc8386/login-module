@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="18dp"
-    tools:context=".MainActivity"
+    tools:context=".controller.MainActivity"
     android:background="@color/white">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -70,7 +70,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:background="@color/dark_gray"
+        android:background="@drawable/bg_primary_button"
         android:padding="12dp"
         android:text="Log in"
         android:textColor="@color/white"
@@ -97,7 +97,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:background="@color/gray"
+        android:background="@drawable/bg_secondary_button"
         android:padding="12dp"
         android:text="SIGN UP"
         android:textColor="@color/white"

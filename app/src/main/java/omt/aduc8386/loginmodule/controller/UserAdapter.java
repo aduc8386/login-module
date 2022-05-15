@@ -1,6 +1,5 @@
-package omt.aduc8386.loginmodule;
+package omt.aduc8386.loginmodule.controller;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.List;
 
-import okhttp3.ResponseBody;
-import omt.aduc8386.loginmodule.api.AppService;
+import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.model.User;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
 

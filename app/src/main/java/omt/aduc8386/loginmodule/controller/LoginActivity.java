@@ -1,4 +1,4 @@
-package omt.aduc8386.loginmodule;
+package omt.aduc8386.loginmodule.controller;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.realm.Realm;
+import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.helper.SharedPreferencesHelper;
 import omt.aduc8386.loginmodule.model.Account;

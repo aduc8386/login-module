@@ -1,4 +1,4 @@
-package omt.aduc8386.loginmodule;
+package omt.aduc8386.loginmodule.controller;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.model.User;
 import retrofit2.Call;
@@ -58,7 +58,6 @@ public class UpdateUserFragment extends DialogFragment {
 
         btnCancel.setOnClickListener(v -> UpdateUserFragment.this.getDialog().cancel());
 
-
         btnUpdate.setOnClickListener(v -> {
             String firstName = edtFirstName.getText().toString();
             String lastName = edtLastName.getText().toString();
@@ -74,8 +73,6 @@ public class UpdateUserFragment extends DialogFragment {
         builder.setView(view);
         return builder.create();
     }
-
-
 
     private void bindView(View view) {
         edtFirstName = view.findViewById(R.id.edt_update_first_name);
