@@ -31,7 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtPassword;
     private CheckBox cbRememberMe;
     private Button btnLogin;
-    private Button btnSignUp;
 
     public ActivityResultLauncher<Intent> intentActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -59,7 +58,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 String email = edtEmail.getText().toString().trim();
                 String password = edtPassword.getText().toString().trim();
-
 
                 Account account = new Account(email, password);
 
@@ -142,6 +140,5 @@ public class LoginActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edt_password);
         cbRememberMe = findViewById(R.id.cb_remember_me);
         btnLogin = findViewById(R.id.btn_login);
-        btnSignUp = findViewById(R.id.btn_sign_up);
     }
 }
