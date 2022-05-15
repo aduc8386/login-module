@@ -16,7 +16,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.fragment.app.DialogFragment;
 
+import omt.aduc8386.loginmodule.api.AppService;
+import omt.aduc8386.loginmodule.helper.RealmHelper;
 import omt.aduc8386.loginmodule.model.User;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddUserFragment extends DialogFragment {
 
@@ -24,7 +29,7 @@ public class AddUserFragment extends DialogFragment {
     private EditText edtJob;
     private Button btnCancel;
     private Button btnAdd;
-    private AddUserListener addUserListener;
+    private Context context;
 
 
     @NonNull
@@ -36,10 +41,7 @@ public class AddUserFragment extends DialogFragment {
 
         View view = inflater.inflate(R.layout.fragment_add_user_dialog, null);
 
-        edtName = view.findViewById(R.id.edt_name);
-        edtJob = view.findViewById(R.id.edt_job);
-        btnCancel = view.findViewById(R.id.btn_cancel);
-        btnAdd = view.findViewById(R.id.btn_add);
+        bindView(view);
 
         btnCancel.setOnClickListener(v -> AddUserFragment.this.getDialog().cancel());
 
@@ -49,34 +51,53 @@ public class AddUserFragment extends DialogFragment {
 
             if(name.isEmpty()) {
                 Toast.makeText(getContext(), "Name can not be empty", Toast.LENGTH_SHORT).show();
-                AddUserFragment.this.getDialog().cancel();
+                return;
             }
 
             User newUser = new User(name, job);
 
-            addUserListener.addUser(newUser);
+            addUser(newUser);
+
             AddUserFragment.this.getDialog().cancel();
         });
-
-
-
 
         builder.setView(view);
         return builder.create();
     }
 
+    private void addUser(User newUser) {
+        AppService.init().addUser(newUser).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User newUserResponse = response.body();
+
+                if(response.isSuccessful() && newUserResponse != null) {
+                    Toast.makeText(context, "User added", Toast.LENGTH_SHORT).show();
+
+                    RealmHelper realmHelper = new RealmHelper();
+                    realmHelper.insertToRealm(newUser);
+                }
+                else Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(context, "User add failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
-        try {
-            addUserListener = (AddUserListener) context;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.context = context;
     }
 
-    public interface AddUserListener {
-        void addUser(User user);
+    private void bindView(View view) {
+        edtName = view.findViewById(R.id.edt_name);
+        edtJob = view.findViewById(R.id.edt_job);
+        btnCancel = view.findViewById(R.id.btn_cancel);
+        btnAdd = view.findViewById(R.id.btn_add);
     }
+
 }

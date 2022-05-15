@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,12 +24,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements AddUserFragment.AddUserListener, UserAdapter.OnUserClickListener {
+public class MainActivity extends AppCompatActivity implements UserAdapter.OnUserClickListener {
 
     private Button btnLogout;
     private Button btnAddUser;
     private RecyclerView rcvUserList;
     private RealmHelper realmHelper;
+
+    public static final String USER_ID = "USER_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
 
         bindView();
 
-        callApi();
+        getUsers();
 
         btnAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,10 +71,11 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
     private void openAddUserDialog() {
         AddUserFragment addUserFragment = new AddUserFragment();
         addUserFragment.show(getSupportFragmentManager(), "ADD_USER_FRAGMENT");
+
     }
 
-    private void callApi() {
-        AppService.init().getUsers(1).enqueue(new Callback<UserResponse>() {
+    private void getUsers() {
+        AppService.init().getUsers(2).enqueue(new Callback<UserResponse>() {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -108,6 +112,20 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
         rcvUserList.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    private boolean isLoggedIn() {
+        return !SharedPreferencesHelper.getUserToken(SharedPreferencesHelper.USER_TOKEN).isEmpty();
+    }
+
+    @Override
+    public void onUserClick(int userId) {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt(USER_ID, userId);
+        UpdateUserFragment updateUserFragment = new UpdateUserFragment();
+        updateUserFragment.setArguments(bundle);
+        updateUserFragment.show(getSupportFragmentManager(), "USER_INFO_FRAGMENT");
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -116,37 +134,5 @@ public class MainActivity extends AppCompatActivity implements AddUserFragment.A
             finishAffinity();
             System.exit(0);
         }
-    }
-
-    private boolean isLoggedIn() {
-        return !SharedPreferencesHelper.getUserToken(SharedPreferencesHelper.USER_TOKEN).isEmpty();
-    }
-
-    @Override
-    public void addUser(User user) {
-        AppService.init().addUser(user).enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User newUser = response.body();
-
-                if(response.isSuccessful() && newUser != null) {
-                    Toast.makeText(MainActivity.this, "User added", Toast.LENGTH_SHORT).show();
-
-                    realmHelper.insertToRealm(user);
-
-                    callApi();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "User add failed", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    @Override
-    public void onUserClick(int position) {
-
     }
 }

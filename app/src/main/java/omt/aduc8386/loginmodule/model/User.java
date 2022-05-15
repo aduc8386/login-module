@@ -35,6 +35,12 @@ public class User extends RealmObject {
         this.job = job;
     }
 
+    public User( String firstName, String lastName, String email) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public String getLastName() {
         return lastName != null ? lastName : "";
     }
@@ -45,6 +51,22 @@ public class User extends RealmObject {
 
     public String getAvatar() {
         return avatar != null ? avatar : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png";
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getUpdateAt() {
+        return updateAt;
     }
 
     public String getFirstName() {

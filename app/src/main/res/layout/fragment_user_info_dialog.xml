@@ -15,43 +15,45 @@
         android:textAlignment="center"
         android:textColor="@color/dark_gray"
         android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="64dp"
-        android:layout_height="64dp"
         android:id="@+id/iv_avatar"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="18dp"
         android:layout_marginEnd="12dp"
         app:layout_constraintEnd_toStartOf="@id/tv_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_update_user"/>
+        app:layout_constraintTop_toBottomOf="@id/tv_update_user" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:padding="16dp"
+        android:layout_marginTop="10dp"
         android:text="Name"
         android:textColor="@color/dark_gray"
         android:textColorHint="@color/gray"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_email"
         app:layout_constraintEnd_toEndOf="@id/tv_update_user"
         app:layout_constraintStart_toEndOf="@id/iv_avatar"
         app:layout_constraintTop_toBottomOf="@id/tv_update_user" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_job"
+        android:id="@+id/tv_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="abc@example.com"
-        android:textStyle="italic"
-        android:padding="16dp"
         android:textColor="@color/light_blue"
         android:textColorHint="@color/gray"
         android:textSize="18sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
         app:layout_constraintEnd_toEndOf="@id/tv_name"
         app:layout_constraintStart_toStartOf="@id/tv_name"
         app:layout_constraintTop_toBottomOf="@id/tv_name" />
@@ -61,20 +63,20 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginBottom="16dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/bg_cancel_button"
         android:padding="8dp"
         android:text="Cancel"
         android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btn_add"
-        app:layout_constraintStart_toStartOf="@id/tv_job"
-        app:layout_constraintTop_toBottomOf="@id/tv_job" />
+        app:layout_constraintEnd_toStartOf="@id/btn_update"
+        app:layout_constraintStart_toStartOf="@id/iv_avatar"
+        app:layout_constraintTop_toBottomOf="@id/tv_email" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_add"
+        android:id="@+id/btn_update"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_add_button"
@@ -83,7 +85,7 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@id/btn_cancel"
-        app:layout_constraintEnd_toEndOf="@id/tv_job"
+        app:layout_constraintEnd_toEndOf="@id/tv_email"
         app:layout_constraintStart_toEndOf="@id/btn_cancel"
         app:layout_constraintTop_toTopOf="@id/btn_cancel" />
 </androidx.constraintlayout.widget.ConstraintLayout>

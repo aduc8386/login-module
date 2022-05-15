@@ -1,5 +1,6 @@
 package omt.aduc8386.loginmodule;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.model.User;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
 
@@ -37,7 +49,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        User user =users.get(position);
+        User user = users.get(position);
 
         Glide.with(holder.itemView.getContext())
                 .load(user.getAvatar())
@@ -54,11 +66,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
         return users != null ? users.size() : 0;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder{
 
         private ImageView ivAvatar;
         private TextView tvName;
         private TextView tvEmail;
+
 
         public MyViewHolder(@NonNull View itemView, OnUserClickListener onUserClickListener) {
             super(itemView);
@@ -68,12 +81,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
             tvEmail = itemView.findViewById(R.id.tv_email);
 
             itemView.setOnClickListener(v -> {
-                onUserClickListener.onUserClick(getAdapterPosition());
+
+                int userId = (int) getItemId(getAdapterPosition());
+                getUser(userId);
+
+                onUserClickListener.onUserClick(userId);
+
             });
+        }
+
+        public long getItemId(int position) {
+            return users != null ? users.get(position).getId() : -1;
         }
     }
 
+    private void getUser(int userId) {
+
+    }
+
     public interface OnUserClickListener {
-        void onUserClick(int position);
+        void onUserClick(int userId);
     }
 }

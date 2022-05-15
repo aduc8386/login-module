@@ -1,5 +1,10 @@
 package omt.aduc8386.loginmodule.api;
 
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
+
+import okhttp3.ResponseBody;
 import omt.aduc8386.loginmodule.model.Account;
 import omt.aduc8386.loginmodule.model.MyResponse;
 import omt.aduc8386.loginmodule.model.User;
@@ -29,6 +34,6 @@ public interface Service {
     Call<UserResponse> getUsers(@Query("page") int pageNumber);
 
     @GET("users/{id}")
-    Call<User> getUserById(@Path("id") int userId);
+    Call<JsonObject> getUserById(@Path("id") int userId);
 
 }
