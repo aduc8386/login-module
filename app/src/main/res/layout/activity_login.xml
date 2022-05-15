@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:padding="18dp"
-    tools:context=".controller.MainActivity"
-    android:background="@color/white">
+    tools:context=".controller.MainActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_login_title"
@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:hint="Email"
-        android:text="eve.holt@reqres.in"
         android:padding="12dp"
+        android:text="eve.holt@reqres.in"
         android:textColor="@color/black"
         android:textColorHint="@color/gray"
         android:textSize="16sp"
@@ -44,9 +44,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:hint="Password"
-        android:text="cityslicka"
         android:inputType="textPassword"
         android:padding="12dp"
+        android:text="cityslicka"
         android:textColor="@color/black"
         android:textColorHint="@color/gray"
         android:textSize="16sp"
@@ -58,10 +58,10 @@
         android:id="@+id/cb_remember_me"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Remember me"
         android:textColor="@color/gray"
         android:textSize="14sp"
-        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="@id/edt_password"
         app:layout_constraintStart_toStartOf="@id/edt_password"
         app:layout_constraintTop_toBottomOf="@id/edt_password" />
