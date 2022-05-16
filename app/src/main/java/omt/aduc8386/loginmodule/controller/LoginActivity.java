@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import io.realm.Realm;
 import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
+import omt.aduc8386.loginmodule.helper.RealmHelper;
 import omt.aduc8386.loginmodule.helper.SharedPreferencesHelper;
 import omt.aduc8386.loginmodule.model.Account;
 import omt.aduc8386.loginmodule.model.MyResponse;
@@ -30,16 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtEmail;
     private EditText edtPassword;
     private CheckBox cbRememberMe;
-    private Button btnLogin;
-
-    public ActivityResultLauncher<Intent> intentActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), result -> {
-                if(result.getResultCode() == RESULT_OK) {
-                    edtEmail.setText(SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_EMAIL));
-                    edtPassword.setText(SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_PASSWORD));
-                    cbRememberMe.setChecked(SharedPreferencesHelper.getRememberMeCheck(SharedPreferencesHelper.REMEMBER_ME));
-                }
-            });
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,41 +38,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         SharedPreferencesHelper.init(this);
         Realm.init(this);
+        RealmHelper.init();
 
         bindView();
 
         if(checkRememberAccount()) return;
-
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String email = edtEmail.getText().toString().trim();
-                String password = edtPassword.getText().toString().trim();
-
-                Account account = new Account(email, password);
-
-                login(account);
-            }
-        });
-
-        cbRememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
-
-                if (buttonView.isChecked()) {
-                    editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, true);
-                    Toast.makeText(LoginActivity.this, "Remember password", Toast.LENGTH_SHORT).show();
-                } else {
-                    editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, false);
-                    editor.putString(SharedPreferencesHelper.USER_EMAIL, "");
-                    editor.putString(SharedPreferencesHelper.USER_PASSWORD, "");
-                    Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
-                }
-                editor.apply();
-            }
-        });
     }
 
     private boolean checkRememberAccount() {
@@ -117,8 +78,9 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     Toast.makeText(LoginActivity.this, String.format("Token: %s", authToken), Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    intentActivityResultLauncher.launch(intent);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
 
                 } else if(account.getEmail().isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Email is required", Toast.LENGTH_SHORT).show();
@@ -139,6 +101,31 @@ public class LoginActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edt_email);
         edtPassword = findViewById(R.id.edt_password);
         cbRememberMe = findViewById(R.id.cb_remember_me);
-        btnLogin = findViewById(R.id.btn_login);
+        Button btnLogin = findViewById(R.id.btn_login);
+
+        btnLogin.setOnClickListener(view -> {
+
+            String email = edtEmail.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim();
+
+            Account account = new Account(email, password);
+
+            login(account);
+        });
+
+        cbRememberMe.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
+
+            if (buttonView.isChecked()) {
+                editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, true);
+                Toast.makeText(LoginActivity.this, "Remember password", Toast.LENGTH_SHORT).show();
+            } else {
+                editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, false);
+                editor.putString(SharedPreferencesHelper.USER_EMAIL, "");
+                editor.putString(SharedPreferencesHelper.USER_PASSWORD, "");
+                Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
+            }
+            editor.apply();
+        });
     }
 }

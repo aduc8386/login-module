@@ -16,38 +16,40 @@ import java.util.List;
 import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.model.User;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
-    private List<User> users;
-    private OnUserClickListener onUserClickListener;
+    private final List<User> users;
+    private final OnUserListener onUserListener;
 
-    public UserAdapter(List<User> users, OnUserClickListener onUserClickListener) {
+    public UserAdapter(List<User> users, OnUserListener onUserListener) {
         this.users = users;
-        this.onUserClickListener = onUserClickListener;
+        this.onUserListener = onUserListener;
     }
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
         View userView = inflater.inflate(R.layout.item_view_user, parent, false);
-
-        return new UserAdapter.MyViewHolder(userView, onUserClickListener);
+        return new UserViewHolder(userView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = users.get(position);
 
-        Glide.with(holder.itemView.getContext())
+        Glide.with(holder.ivAvatar.getContext())
                 .load(user.getAvatar())
                 .centerCrop()
+                .error(R.drawable.avatar)
                 .into(holder.ivAvatar);
 
         holder.tvName.setText(String.format("%s %s", user.getFirstName(), user.getLastName()));
         holder.tvEmail.setText(user.getEmail());
 
+        holder.itemView.setOnClickListener(v -> {
+            onUserListener.onUserClick(user.getId());
+        });
     }
 
     @Override
@@ -55,40 +57,23 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
         return users != null ? users.size() : 0;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public static class UserViewHolder extends RecyclerView.ViewHolder{
 
         private ImageView ivAvatar;
         private TextView tvName;
         private TextView tvEmail;
 
 
-        public MyViewHolder(@NonNull View itemView, OnUserClickListener onUserClickListener) {
+        public UserViewHolder(@NonNull View itemView) {
             super(itemView);
 
             ivAvatar = itemView.findViewById(R.id.iv_avatar);
             tvName = itemView.findViewById(R.id.tv_name);
             tvEmail = itemView.findViewById(R.id.tv_email);
-
-            itemView.setOnClickListener(v -> {
-
-                int userId = (int) getItemId(getAdapterPosition());
-                getUser(userId);
-
-                onUserClickListener.onUserClick(userId);
-
-            });
-        }
-
-        public long getItemId(int position) {
-            return users != null ? users.get(position).getId() : -1;
         }
     }
 
-    private void getUser(int userId) {
-
-    }
-
-    public interface OnUserClickListener {
+    public interface OnUserListener {
         void onUserClick(int userId);
     }
 }

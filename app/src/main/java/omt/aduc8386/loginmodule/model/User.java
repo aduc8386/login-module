@@ -46,11 +46,11 @@ public class User extends RealmObject {
     }
 
     public String getEmail() {
-        return email != null ? email : "abc@example.com";
+        return email != null ? email : "";
     }
 
     public String getAvatar() {
-        return avatar != null ? avatar : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png";
+        return avatar = avatar;
     }
 
     public Integer getId() {
