@@ -2,9 +2,7 @@ package omt.aduc8386.loginmodule.controller;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,8 +24,14 @@ public class AddUserDialogFragment extends DialogFragment {
     private EditText edtName;
     private EditText edtJob;
     private Context context;
+    private OnAddUserListener addUserListener;
 
     public final static String TAG = "ADD_USER_DIALOG_FRAGMENT";
+
+    public AddUserDialogFragment(OnAddUserListener addUserListener) {
+        super(R.layout.fragment_add_user_dialog);
+        this.addUserListener = addUserListener;
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -41,12 +45,10 @@ public class AddUserDialogFragment extends DialogFragment {
         setStyle(DialogFragment.STYLE_NORMAL, R.style.AlertDialog_AppCompat_RoundedBackground);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_user_dialog, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         bindView(view);
-        return view;
     }
 
     private void addUser(User newUser) {
@@ -58,13 +60,19 @@ public class AddUserDialogFragment extends DialogFragment {
                 if(response.isSuccessful() && newUserResponse != null) {
                     Toast.makeText(context, "User added", Toast.LENGTH_SHORT).show();
 
-                    RealmHelper.insertToRealm(newUser);
+                    RealmHelper.insertOrUpdateUserToRealm(newUser);
                 }
                 else Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+                if (addUserListener != null) {
+                    addUserListener.onSuccess();
+                }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                if (addUserListener != null) {
+                    addUserListener.onFailure();
+                }
                 Toast.makeText(context, "User add failed", Toast.LENGTH_SHORT).show();
             }
         });
@@ -93,6 +101,14 @@ public class AddUserDialogFragment extends DialogFragment {
 
             AddUserDialogFragment.this.getDialog().cancel();
         });
+    }
+
+    public interface OnAddUserListener{
+
+        void onSuccess();
+
+        void onFailure();
+
     }
 
 }

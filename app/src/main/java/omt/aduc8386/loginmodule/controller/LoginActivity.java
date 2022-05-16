@@ -31,35 +31,28 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtEmail;
     private EditText edtPassword;
     private CheckBox cbRememberMe;
+    private Button btnLogin;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        SharedPreferencesHelper.init(this);
-        Realm.init(this);
-        RealmHelper.init();
-
         bindView();
-
-        if(checkRememberAccount()) return;
+        checkRememberAccount();
     }
 
-    private boolean checkRememberAccount() {
-        boolean rememberMe = SharedPreferencesHelper.getRememberMeCheck(SharedPreferencesHelper.REMEMBER_ME);
-        String userEmail = SharedPreferencesHelper.getUserEmail(SharedPreferencesHelper.USER_EMAIL);
-        String userPassword = SharedPreferencesHelper.getUserPassword(SharedPreferencesHelper.USER_PASSWORD);
+    private void checkRememberAccount() {
+        boolean rememberMe = SharedPreferencesHelper.getRememberMeCheck();
+        String userEmail = SharedPreferencesHelper.getUserEmail();
+        String userPassword = SharedPreferencesHelper.getUserPassword();
 
-        if(rememberMe) {
+        if (rememberMe) {
             Account userAccount = new Account(userEmail, userPassword);
             edtEmail.setText(userEmail);
             edtPassword.setText(userPassword);
             cbRememberMe.setChecked(true);
             login(userAccount);
-            return true;
         }
-
-        return false;
     }
 
     private void login(Account account) {
@@ -70,11 +63,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (response.code() == 200 && myResponse != null) {
                     String authToken = myResponse.getAuthToken();
-                    SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
-                    editor.putString(SharedPreferencesHelper.USER_TOKEN, authToken);
-                    editor.putString(SharedPreferencesHelper.USER_EMAIL, account.getEmail());
-                    editor.putString(SharedPreferencesHelper.USER_PASSWORD, account.getPassword());
-                    editor.apply();
+                    SharedPreferencesHelper.setUserToken(authToken);
+                    SharedPreferencesHelper.setUserEmail(account.getEmail());
+                    SharedPreferencesHelper.setUserPassword(account.getPassword());
+
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     Toast.makeText(LoginActivity.this, String.format("Token: %s", authToken), Toast.LENGTH_SHORT).show();
 
@@ -82,9 +74,9 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
 
-                } else if(account.getEmail().isEmpty()) {
+                } else if (account.getEmail().isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Email is required", Toast.LENGTH_SHORT).show();
-                } else if(account.getPassword().isEmpty()) {
+                } else if (account.getPassword().isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Missing password", Toast.LENGTH_SHORT).show();
                 } else
                     Toast.makeText(LoginActivity.this, "Email or password incorrect", Toast.LENGTH_SHORT).show();
@@ -101,10 +93,9 @@ public class LoginActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edt_email);
         edtPassword = findViewById(R.id.edt_password);
         cbRememberMe = findViewById(R.id.cb_remember_me);
-        Button btnLogin = findViewById(R.id.btn_login);
+        btnLogin = findViewById(R.id.btn_login);
 
         btnLogin.setOnClickListener(view -> {
-
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
 
@@ -114,18 +105,15 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         cbRememberMe.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
-
             if (buttonView.isChecked()) {
-                editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, true);
+                SharedPreferencesHelper.setRememberMe(true);
                 Toast.makeText(LoginActivity.this, "Remember password", Toast.LENGTH_SHORT).show();
             } else {
-                editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, false);
-                editor.putString(SharedPreferencesHelper.USER_EMAIL, "");
-                editor.putString(SharedPreferencesHelper.USER_PASSWORD, "");
+                SharedPreferencesHelper.setUserEmail("");
+                SharedPreferencesHelper.setUserPassword("");
+                SharedPreferencesHelper.setRememberMe(false);
                 Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
             }
-            editor.apply();
         });
     }
 }

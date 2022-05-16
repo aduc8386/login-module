@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +21,10 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import io.realm.Realm;
 import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
+import omt.aduc8386.loginmodule.helper.RealmHelper;
 import omt.aduc8386.loginmodule.model.User;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,15 +36,21 @@ public class UpdateUserDialogFragment extends DialogFragment {
     private EditText edtLastName;
     private EditText edtEmail;
     private ImageView ivAvatar;
-
     private Context context;
 
-    private int userId;
+    private OnUpdateUserListener onUpdateUserListener;
+
+    private int userId = -1;
 
     public static final String TAG = "UPDATE_USER_DIALOG_FRAGMENT";
 
-    public static UpdateUserDialogFragment newInstance(int userId) {
+    public UpdateUserDialogFragment() {
+        super(R.layout.fragment_update_user_dialog);
+    }
+
+    public static UpdateUserDialogFragment newInstance(int userId, OnUpdateUserListener onUpdateUserListener) {
         UpdateUserDialogFragment updateUserDialogFragment = new UpdateUserDialogFragment();
+        updateUserDialogFragment.onUpdateUserListener = onUpdateUserListener;
         Bundle bundle = new Bundle();
 
         bundle.putInt(MainActivity.USER_ID, userId);
@@ -62,12 +71,10 @@ public class UpdateUserDialogFragment extends DialogFragment {
         setStyle(DialogFragment.STYLE_NORMAL, R.style.AlertDialog_AppCompat_RoundedBackground);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_update_user_dialog, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         bindView(view);
-        return view;
     }
 
     private void bindView(View view) {
@@ -82,17 +89,16 @@ public class UpdateUserDialogFragment extends DialogFragment {
 
         if(getArguments() != null) {
             userId = getArguments().getInt(MainActivity.USER_ID);
-
             getUser(userId);
 
             btnUpdate.setOnClickListener(v -> {
                 String firstName = edtFirstName.getText().toString();
                 String lastName = edtLastName.getText().toString();
                 String email = edtEmail.getText().toString();
+                User user = new User(userId, firstName, lastName, email);
 
-                User user = new User(firstName, lastName, email);
-
-                updateUser(userId, user);
+                updateUser(user);
+                RealmHelper.insertOrUpdateUserToRealm(user);
 
                 UpdateUserDialogFragment.this.getDialog().cancel();
             });
@@ -128,19 +134,28 @@ public class UpdateUserDialogFragment extends DialogFragment {
         });
     }
 
-    private void updateUser(int userId, User user) {
-        AppService.init().updateUser(userId, user).enqueue(new Callback<User>() {
+    private void updateUser(User user) {
+        AppService.init().updateUser(user.getId(), user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.isSuccessful() && response.body() != null){
                     Toast.makeText(context, "User updated", Toast.LENGTH_SHORT).show();
+
+                    if(onUpdateUserListener != null) onUpdateUserListener.onSuccess();
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(context, "User update fail", Toast.LENGTH_SHORT).show();
+                if(onUpdateUserListener != null) onUpdateUserListener.onFailure();
             }
         });
+    }
+
+    public interface OnUpdateUserListener {
+        void onSuccess();
+
+        void onFailure();
     }
 }

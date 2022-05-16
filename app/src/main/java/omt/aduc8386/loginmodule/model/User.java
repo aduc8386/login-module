@@ -35,7 +35,8 @@ public class User extends RealmObject {
         this.job = job;
     }
 
-    public User( String firstName, String lastName, String email) {
+    public User(Integer id, String firstName, String lastName, String email) {
+        this.id = id;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;

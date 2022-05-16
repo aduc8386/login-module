@@ -12,7 +12,7 @@ public class RealmHelper {
 
     public static final String REALM = "REALM";
 
-    public static void init() {
+    private static void init() {
         if (instance == null) {
             RealmConfiguration config = new RealmConfiguration.Builder()
                     .name(REALM)
@@ -24,12 +24,25 @@ public class RealmHelper {
     }
 
     public static Realm getInstance() {
+        init();
         return instance;
     }
 
-    public static void insertToRealm(User user) {
+    public static void insertOrUpdateUsersToRealm(List<User> users) {
         try{
-            instance.executeTransaction(transactionRealm -> {
+            getInstance().executeTransaction(transactionRealm -> {
+                transactionRealm.insertOrUpdate(users);
+                transactionRealm.commitTransaction();
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void insertOrUpdateUserToRealm(User user) {
+        try{
+            getInstance().executeTransaction(transactionRealm -> {
                 transactionRealm.insertOrUpdate(user);
                 transactionRealm.commitTransaction();
             });

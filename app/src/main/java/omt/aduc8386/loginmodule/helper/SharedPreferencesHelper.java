@@ -25,19 +25,32 @@ public class SharedPreferencesHelper {
         return instance;
     }
 
-    public static boolean getRememberMeCheck(String key) {
-        return instance.getBoolean(key, false);
+    public static boolean getRememberMeCheck() {
+        return instance.getBoolean(REMEMBER_ME, false);
     }
 
-    public static String getUserEmail(String key) {
-        return instance.getString(key, "");
+    public static String getUserEmail() {
+        return instance.getString(USER_EMAIL, "");
     }
 
-    public static String getUserPassword(String key) {
-        return instance.getString(key, "");
+    public static String getUserPassword() {
+        return instance.getString(USER_PASSWORD, "");
     }
 
-    public static String getUserToken(String key) {
-        return instance.getString(key, "");
+    public static void setUserEmail(String userEmail){
+        instance.edit().putString(USER_EMAIL, userEmail).apply();
     }
+
+    public static void setUserPassword(String name){
+        instance.edit().putString(USER_PASSWORD, name).apply();
+    }
+
+    public static void setRememberMe(boolean rememberMe){
+        instance.edit().putBoolean(REMEMBER_ME, rememberMe).apply();
+    }
+
+    public static void setUserToken(String userToken){
+        instance.edit().putString(USER_TOKEN, userToken).apply();
+    }
+
 }

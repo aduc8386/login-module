@@ -1,7 +1,6 @@
 package omt.aduc8386.loginmodule.controller;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -25,6 +24,8 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements UserAdapter.OnUserListener {
 
     private RecyclerView rcvUserList;
+    private Button btnLogout;
+    private Button btnAddUser;
 
     public static final String USER_ID = "USER_ID";
 
@@ -39,7 +40,17 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
     }
 
     private void openAddUserDialog() {
-        AddUserDialogFragment addUserDialogFragment = new AddUserDialogFragment();
+        AddUserDialogFragment addUserDialogFragment = new AddUserDialogFragment(new AddUserDialogFragment.OnAddUserListener() {
+            @Override
+            public void onSuccess() {
+                getUsers();
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
         addUserDialogFragment.show(getSupportFragmentManager(), AddUserDialogFragment.TAG);
     }
 
@@ -51,9 +62,7 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
                     Toast.makeText(MainActivity.this, "Api called successful", Toast.LENGTH_SHORT).show();
                     List<User> users = response.body().getUsers();
 
-                    for (User user : users) {
-                        RealmHelper.insertToRealm(user);
-                    }
+                    RealmHelper.insertOrUpdateUsersToRealm(users);
                     showUserList(users);
                 }
             }
@@ -71,20 +80,17 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
 
     private void bindView() {
         rcvUserList = findViewById(R.id.rcv_user_list);
-        Button btnLogout = findViewById(R.id.btn_logout);
-        Button btnAddUser = findViewById(R.id.btn_add_user);
+        btnLogout = findViewById(R.id.btn_logout);
+        btnAddUser = findViewById(R.id.btn_add_user);
         rcvUserList.setLayoutManager(new LinearLayoutManager(this));
 
         btnAddUser.setOnClickListener(v -> openAddUserDialog());
 
         btnLogout.setOnClickListener(v -> {
-            SharedPreferences.Editor editor = SharedPreferencesHelper.getInstance().edit();
-
-            editor.putBoolean(SharedPreferencesHelper.REMEMBER_ME, false);
-            editor.putString(SharedPreferencesHelper.USER_EMAIL, "");
-            editor.putString(SharedPreferencesHelper.USER_PASSWORD, "");
-            editor.putString(SharedPreferencesHelper.USER_TOKEN, "");
-            editor.apply();
+            SharedPreferencesHelper.setUserEmail("");
+            SharedPreferencesHelper.setUserPassword("");
+            SharedPreferencesHelper.setRememberMe(false);
+            SharedPreferencesHelper.setUserToken("");
 
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
 
@@ -95,7 +101,17 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
 
     @Override
     public void onUserClick(int userId) {
-        UpdateUserDialogFragment updateUserDialogFragment = UpdateUserDialogFragment.newInstance(userId);
+        UpdateUserDialogFragment updateUserDialogFragment = UpdateUserDialogFragment.newInstance(userId, new UpdateUserDialogFragment.OnUpdateUserListener() {
+            @Override
+            public void onSuccess() {
+                getUsers();
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
         updateUserDialogFragment.show(getSupportFragmentManager(), UpdateUserDialogFragment.TAG);
     }
 }
