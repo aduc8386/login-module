@@ -43,10 +43,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkRememberAccount() {
         boolean rememberMe = SharedPreferencesHelper.getRememberMeCheck();
-        String userEmail = SharedPreferencesHelper.getUserEmail();
-        String userPassword = SharedPreferencesHelper.getUserPassword();
 
         if (rememberMe) {
+            String userEmail = SharedPreferencesHelper.getUserEmail();
+            String userPassword = SharedPreferencesHelper.getUserPassword();
             Account userAccount = new Account(userEmail, userPassword);
             edtEmail.setText(userEmail);
             edtPassword.setText(userPassword);
@@ -66,10 +66,6 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferencesHelper.setUserToken(authToken);
                     SharedPreferencesHelper.setUserEmail(account.getEmail());
                     SharedPreferencesHelper.setUserPassword(account.getPassword());
-
-                    Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(LoginActivity.this, String.format("Token: %s", authToken), Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -107,12 +103,10 @@ public class LoginActivity extends AppCompatActivity {
         cbRememberMe.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (buttonView.isChecked()) {
                 SharedPreferencesHelper.setRememberMe(true);
-                Toast.makeText(LoginActivity.this, "Remember password", Toast.LENGTH_SHORT).show();
             } else {
                 SharedPreferencesHelper.setUserEmail("");
                 SharedPreferencesHelper.setUserPassword("");
                 SharedPreferencesHelper.setRememberMe(false);
-                Toast.makeText(LoginActivity.this, "Forgot password", Toast.LENGTH_SHORT).show();
             }
         });
     }

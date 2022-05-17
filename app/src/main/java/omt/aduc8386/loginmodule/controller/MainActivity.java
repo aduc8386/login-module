@@ -2,10 +2,13 @@ package omt.aduc8386.loginmodule.controller;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,17 +35,33 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if (checkIsNotLoggedIn()) return;
 
+        setContentView(R.layout.activity_main);
         bindView();
 
         getUsers();
     }
 
+    private boolean checkIsNotLoggedIn() {
+        String userToken = SharedPreferencesHelper.getUserToken();
+
+        if (userToken.isEmpty()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        return false;
+    }
+
     private void openAddUserDialog() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
         AddUserDialogFragment addUserDialogFragment = new AddUserDialogFragment(new AddUserDialogFragment.OnAddUserListener() {
+
             @Override
-            public void onSuccess() {
+            public void onSuccess(Response<User> response) {
                 getUsers();
             }
 
@@ -51,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
 
             }
         });
-        addUserDialogFragment.show(getSupportFragmentManager(), AddUserDialogFragment.TAG);
+        addUserDialogFragment.show(fragmentTransaction, AddUserDialogFragment.TAG);
     }
 
     private void getUsers() {
@@ -59,16 +78,17 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(MainActivity.this, "Api called successful", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "onResponse: api called successful");
                     List<User> users = response.body().getUsers();
 
                     RealmHelper.insertOrUpdateUsersToRealm(users);
                     showUserList(users);
                 }
             }
+
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Api call failed", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "onFailure: api call failed");
             }
         });
     }
@@ -87,12 +107,11 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
         btnAddUser.setOnClickListener(v -> openAddUserDialog());
 
         btnLogout.setOnClickListener(v -> {
-            SharedPreferencesHelper.setUserEmail("");
             SharedPreferencesHelper.setUserPassword("");
             SharedPreferencesHelper.setRememberMe(false);
             SharedPreferencesHelper.setUserToken("");
 
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
 
             startActivity(intent);
             finish();
@@ -101,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
 
     @Override
     public void onUserClick(int userId) {
-        UpdateUserDialogFragment updateUserDialogFragment = UpdateUserDialogFragment.newInstance(userId, new UpdateUserDialogFragment.OnUpdateUserListener() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        DialogFragment updateUserDialogFragment = UpdateUserDialogFragment.newInstance(userId, new UpdateUserDialogFragment.OnUpdateUserListener() {
             @Override
             public void onSuccess() {
                 getUsers();
@@ -112,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
 
             }
         });
-        updateUserDialogFragment.show(getSupportFragmentManager(), UpdateUserDialogFragment.TAG);
+
+        updateUserDialogFragment.show(fragmentTransaction, UpdateUserDialogFragment.TAG);
     }
 }

@@ -37,19 +37,23 @@ public class SharedPreferencesHelper {
         return instance.getString(USER_PASSWORD, "");
     }
 
-    public static void setUserEmail(String userEmail){
+    public static String getUserToken() {
+        return instance.getString(USER_TOKEN, "");
+    }
+
+    public static void setUserEmail(String userEmail) {
         instance.edit().putString(USER_EMAIL, userEmail).apply();
     }
 
-    public static void setUserPassword(String name){
+    public static void setUserPassword(String name) {
         instance.edit().putString(USER_PASSWORD, name).apply();
     }
 
-    public static void setRememberMe(boolean rememberMe){
+    public static void setRememberMe(boolean rememberMe) {
         instance.edit().putBoolean(REMEMBER_ME, rememberMe).apply();
     }
 
-    public static void setUserToken(String userToken){
+    public static void setUserToken(String userToken) {
         instance.edit().putString(USER_TOKEN, userToken).apply();
     }
 

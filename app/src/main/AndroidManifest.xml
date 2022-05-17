@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
-            android:name=".controller.LoginActivity"
+            android:name=".controller.MainActivity"
 
             android:exported="true">
             <intent-filter>
@@ -21,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".controller.MainActivity"/>
+        <activity android:name=".controller.LoginActivity"/>
     </application>
 
 </manifest>

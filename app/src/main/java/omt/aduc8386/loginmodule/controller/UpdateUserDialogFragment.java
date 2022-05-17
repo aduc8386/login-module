@@ -16,12 +16,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import io.realm.Realm;
+import omt.aduc8386.loginmodule.LoadingDialogFragment;
 import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
 import omt.aduc8386.loginmodule.helper.RealmHelper;
@@ -36,7 +38,8 @@ public class UpdateUserDialogFragment extends DialogFragment {
     private EditText edtLastName;
     private EditText edtEmail;
     private ImageView ivAvatar;
-    private Context context;
+    private Button btnCancel;
+    private Button btnUpdate;
 
     private OnUpdateUserListener onUpdateUserListener;
 
@@ -60,15 +63,9 @@ public class UpdateUserDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        this.context = context;
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.AlertDialog_AppCompat_RoundedBackground);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_AppCompat_RoundedBackground);
     }
 
     @Override
@@ -82,25 +79,27 @@ public class UpdateUserDialogFragment extends DialogFragment {
         edtLastName = view.findViewById(R.id.edt_update_last_name);
         edtEmail = view.findViewById(R.id.edt_update_email);
         ivAvatar = view.findViewById(R.id.iv_avatar);
-        Button btnCancel = view.findViewById(R.id.btn_cancel);
-        Button btnUpdate = view.findViewById(R.id.btn_update);
+         btnCancel = view.findViewById(R.id.btn_cancel);
+         btnUpdate = view.findViewById(R.id.btn_update);
 
-        btnCancel.setOnClickListener(v -> UpdateUserDialogFragment.this.getDialog().cancel());
+        btnCancel.setOnClickListener(v -> dismiss());
 
         if(getArguments() != null) {
             userId = getArguments().getInt(MainActivity.USER_ID);
             getUser(userId);
 
             btnUpdate.setOnClickListener(v -> {
+                FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction();
+                LoadingDialogFragment loadingDialogFragment = new LoadingDialogFragment();
+                loadingDialogFragment.show(fragmentTransaction, LoadingDialogFragment.TAG);
                 String firstName = edtFirstName.getText().toString();
                 String lastName = edtLastName.getText().toString();
                 String email = edtEmail.getText().toString();
                 User user = new User(userId, firstName, lastName, email);
 
                 updateUser(user);
-                RealmHelper.insertOrUpdateUserToRealm(user);
+                loadingDialogFragment.dismiss();
 
-                UpdateUserDialogFragment.this.getDialog().cancel();
             });
         }
     }
@@ -110,7 +109,7 @@ public class UpdateUserDialogFragment extends DialogFragment {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if(response.body() != null && response.isSuccessful()) {
-                    Toast.makeText(context, "Get user information successful", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "onResponse: get user information successful");
 
                     String userJson = response.body().getAsJsonObject("data").toString();
                     Gson gson = new Gson();
@@ -129,7 +128,7 @@ public class UpdateUserDialogFragment extends DialogFragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(context, "Get user information failed", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "onFailure: get user information failed");
             }
         });
     }
@@ -138,17 +137,22 @@ public class UpdateUserDialogFragment extends DialogFragment {
         AppService.init().updateUser(user.getId(), user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if(response.isSuccessful() && response.body() != null){
-                    Toast.makeText(context, "User updated", Toast.LENGTH_SHORT).show();
 
+                if(response.isSuccessful() && response.body() != null){
+                    Log.d("TAG", "onResponse: user information updated");
+                    RealmHelper.insertOrUpdateUserToRealm(user);
                     if(onUpdateUserListener != null) onUpdateUserListener.onSuccess();
                 }
+                else Log.d("TAG", "onResponse: something went wrong");
+
+                dismiss();
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(context, "User update fail", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "onFailure: user information update failed");
                 if(onUpdateUserListener != null) onUpdateUserListener.onFailure();
+                dismiss();
             }
         });
     }

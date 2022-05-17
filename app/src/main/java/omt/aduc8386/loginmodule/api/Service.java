@@ -33,6 +33,9 @@ public interface Service {
     @GET("users")
     Call<UserResponse> getUsers(@Query("page") int pageNumber);
 
+    @GET("users")
+    Call<UserResponse> getUsersDelayed(@Query("delay") int delayLevel);
+
     @GET("users/{id}")
     Call<JsonObject> getUserById(@Path("id") int userId);
 
