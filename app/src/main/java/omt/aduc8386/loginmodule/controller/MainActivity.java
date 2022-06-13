@@ -7,17 +7,18 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
-import omt.aduc8386.loginmodule.helper.RealmHelper;
-import omt.aduc8386.loginmodule.helper.SharedPreferencesHelper;
+import omt.aduc8386.loginmodule.controller.helper.RealmHelper;
+import omt.aduc8386.loginmodule.controller.helper.SharedPreferencesHelper;
 import omt.aduc8386.loginmodule.model.User;
 import omt.aduc8386.loginmodule.model.UserResponse;
 import retrofit2.Call;
@@ -26,7 +27,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements UserAdapter.OnUserListener {
 
-    private RecyclerView rcvUserList;
+    @BindView(R.id.rcv_user_list) RecyclerView rcvUserList;
     private Button btnLogout;
     private Button btnAddUser;
 
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
         AddUserDialogFragment addUserDialogFragment = new AddUserDialogFragment(new AddUserDialogFragment.OnAddUserListener() {
 
             @Override
-            public void onSuccess(Response<User> response) {
+            public void onSuccess() {
                 getUsers();
             }
 
@@ -85,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
                     showUserList(users);
                 }
             }
-
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
                 Log.d("TAG", "onFailure: api call failed");
@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements UserAdapter.OnUse
     }
 
     private void bindView() {
-        rcvUserList = findViewById(R.id.rcv_user_list);
+        ButterKnife.bind(this);
+//        rcvUserList = findViewById(R.id.rcv_user_list);
         btnLogout = findViewById(R.id.btn_logout);
         btnAddUser = findViewById(R.id.btn_add_user);
         rcvUserList.setLayoutManager(new LinearLayoutManager(this));

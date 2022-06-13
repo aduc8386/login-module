@@ -1,10 +1,17 @@
-package omt.aduc8386.loginmodule;
+package omt.aduc8386.loginmodule.controller;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import omt.aduc8386.loginmodule.R;
 
 public class LoadingDialogFragment extends DialogFragment {
 
@@ -19,6 +26,4 @@ public class LoadingDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_AppCompat_RoundedBackground);
     }
-
-
 }

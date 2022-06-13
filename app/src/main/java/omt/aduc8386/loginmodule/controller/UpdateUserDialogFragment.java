@@ -1,17 +1,11 @@
 package omt.aduc8386.loginmodule.controller;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,11 +16,9 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import io.realm.Realm;
-import omt.aduc8386.loginmodule.LoadingDialogFragment;
 import omt.aduc8386.loginmodule.R;
 import omt.aduc8386.loginmodule.api.AppService;
-import omt.aduc8386.loginmodule.helper.RealmHelper;
+import omt.aduc8386.loginmodule.controller.helper.RealmHelper;
 import omt.aduc8386.loginmodule.model.User;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,6 +34,7 @@ public class UpdateUserDialogFragment extends DialogFragment {
     private Button btnUpdate;
 
     private OnUpdateUserListener onUpdateUserListener;
+    private LoadingDialogFragment loadingDialogFragment;
 
     private int userId = -1;
 
@@ -51,6 +44,7 @@ public class UpdateUserDialogFragment extends DialogFragment {
         super(R.layout.fragment_update_user_dialog);
     }
 
+    @NonNull
     public static UpdateUserDialogFragment newInstance(int userId, OnUpdateUserListener onUpdateUserListener) {
         UpdateUserDialogFragment updateUserDialogFragment = new UpdateUserDialogFragment();
         updateUserDialogFragment.onUpdateUserListener = onUpdateUserListener;
@@ -79,27 +73,24 @@ public class UpdateUserDialogFragment extends DialogFragment {
         edtLastName = view.findViewById(R.id.edt_update_last_name);
         edtEmail = view.findViewById(R.id.edt_update_email);
         ivAvatar = view.findViewById(R.id.iv_avatar);
-         btnCancel = view.findViewById(R.id.btn_cancel);
-         btnUpdate = view.findViewById(R.id.btn_update);
+        btnCancel = view.findViewById(R.id.btn_cancel);
+        btnUpdate = view.findViewById(R.id.btn_update);
 
         btnCancel.setOnClickListener(v -> dismiss());
 
-        if(getArguments() != null) {
+        if (getArguments() != null) {
             userId = getArguments().getInt(MainActivity.USER_ID);
             getUser(userId);
 
             btnUpdate.setOnClickListener(v -> {
-                FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction();
-                LoadingDialogFragment loadingDialogFragment = new LoadingDialogFragment();
-                loadingDialogFragment.show(fragmentTransaction, LoadingDialogFragment.TAG);
+                loadingDialogFragment = new LoadingDialogFragment();
+                loadingDialogFragment.show(getParentFragmentManager(), LoadingDialogFragment.TAG);
                 String firstName = edtFirstName.getText().toString();
                 String lastName = edtLastName.getText().toString();
                 String email = edtEmail.getText().toString();
                 User user = new User(userId, firstName, lastName, email);
 
                 updateUser(user);
-                loadingDialogFragment.dismiss();
-
             });
         }
     }
@@ -108,7 +99,7 @@ public class UpdateUserDialogFragment extends DialogFragment {
         AppService.init().getUserById(userId).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if(response.body() != null && response.isSuccessful()) {
+                if (response.body() != null && response.isSuccessful()) {
                     Log.d("TAG", "onResponse: get user information successful");
 
                     String userJson = response.body().getAsJsonObject("data").toString();
@@ -138,20 +129,21 @@ public class UpdateUserDialogFragment extends DialogFragment {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
 
-                if(response.isSuccessful() && response.body() != null){
+                if (response.isSuccessful() && response.body() != null) {
                     Log.d("TAG", "onResponse: user information updated");
                     RealmHelper.insertOrUpdateUserToRealm(user);
-                    if(onUpdateUserListener != null) onUpdateUserListener.onSuccess();
-                }
-                else Log.d("TAG", "onResponse: something went wrong");
+                    if (onUpdateUserListener != null) onUpdateUserListener.onSuccess();
+                } else Log.d("TAG", "onResponse: something went wrong");
 
+                loadingDialogFragment.dismiss();
                 dismiss();
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 Log.d("TAG", "onFailure: user information update failed");
-                if(onUpdateUserListener != null) onUpdateUserListener.onFailure();
+                if (onUpdateUserListener != null) onUpdateUserListener.onFailure();
+                loadingDialogFragment.dismiss();
                 dismiss();
             }
         });
