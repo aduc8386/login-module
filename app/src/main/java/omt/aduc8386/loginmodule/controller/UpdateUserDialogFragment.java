@@ -112,7 +112,7 @@ public class UpdateUserDialogFragment extends DialogFragment {
                     Glide.with(ivAvatar.getContext())
                             .load(user.getAvatar())
                             .centerCrop()
-                            .error(R.drawable.avatar)
+                            .error(R.drawable.ic_avatar)
                             .into(ivAvatar);
                 }
             }

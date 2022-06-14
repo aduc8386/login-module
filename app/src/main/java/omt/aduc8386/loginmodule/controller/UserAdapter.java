@@ -41,7 +41,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         Glide.with(holder.ivAvatar.getContext())
                 .load(user.getAvatar())
                 .centerCrop()
-                .error(R.drawable.avatar)
+                .error(R.drawable.ic_avatar)
                 .into(holder.ivAvatar);
 
         holder.tvName.setText(String.format("%s %s", user.getFirstName(), user.getLastName()));
